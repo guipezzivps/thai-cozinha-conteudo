@@ -1,0 +1,229 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { markdownToHtml } from '../lib/simpleMarkdown';
+
+// astro build/dev sempre roda com cwd = raiz do projeto Astro (onde fica astro.config)
+const projectRoot = join(process.cwd(), '../..'); // .../clientes/Thai Cozinha
+
+function readSafe(path: string): string | null {
+  try {
+    return readFileSync(path, 'utf-8');
+  } catch {
+    return null;
+  }
+}
+
+// --- Pendências (briefing.md) ---
+const briefingRaw = readSafe(join(projectRoot, 'briefing.md')) ?? '';
+const pendMatch = briefingRaw.split(/\n##\s+Pendências pra validar com o cliente\s*\n/);
+const pendenciasHtml = pendMatch.length > 1 ? markdownToHtml(pendMatch[1].trim()) : '';
+
+// --- Fila de conteúdo (marketing/conteudo/*) ---
+const conteudoDir = join(projectRoot, 'marketing/conteudo');
+let pipeline: {
+  folder: string;
+  title: string;
+  slideCount: number;
+  hasLegenda: boolean;
+  hasHtml: boolean;
+  status: string;
+  badge: string;
+}[] = [];
+if (existsSync(conteudoDir)) {
+  const folders = readdirSync(conteudoDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !e.name.startsWith('_'))
+    .map((e) => e.name)
+    .sort();
+
+  pipeline = folders.map((folder) => {
+    const folderPath = join(conteudoDir, folder);
+    let title = folder;
+    const texto = readSafe(join(folderPath, 'texto.md'));
+    if (texto) {
+      const m = texto.match(/^#\s+(.*)$/m);
+      if (m) title = m[1];
+    }
+    let slideCount = 0;
+    const instagramDir = join(folderPath, 'instagram');
+    if (existsSync(instagramDir)) {
+      slideCount = readdirSync(instagramDir).filter((f) => /^slide-\d+\.png$/.test(f)).length;
+    }
+    const hasLegenda = existsSync(join(folderPath, 'legenda.md'));
+    const hasHtml = existsSync(join(folderPath, 'carrossel.html'));
+
+    let status = 'Em andamento';
+    let badge = 'badge-todo';
+    if (slideCount > 0 && hasLegenda) {
+      status = 'Pronto pra publicar';
+      badge = 'badge-ok';
+    } else if (hasHtml) {
+      status = 'HTML criado, falta renderizar/legenda';
+      badge = 'badge-pending';
+    }
+
+    return { folder, title, slideCount, hasLegenda, hasHtml, status, badge };
+  });
+}
+
+// --- Posts do blog ---
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
+
+// --- Docs de estratégia/SEO ---
+function loadDoc(filename: string) {
+  const raw = readSafe(join(projectRoot, 'marketing/seo', filename));
+  if (!raw) return null;
+  const titleMatch = raw.match(/^#\s+(.*)$/m);
+  const title = titleMatch ? titleMatch[1] : filename;
+  const body = titleMatch ? raw.slice(raw.indexOf(titleMatch[0]) + titleMatch[0].length).trim() : raw;
+  return { title, html: markdownToHtml(body) };
+}
+
+const estrategiaDoc = loadDoc('05-estrategia-conteudo.md');
+const demandaDoc = loadDoc('01-pesquisa-demanda.md');
+const concorrenciaDoc = loadDoc('02-analise-concorrencia.md');
+const geoDoc = loadDoc('08-geo-otimizacao-ia.md');
+---
+
+<Layout
+  title="Painel — conteúdo e crescimento"
+  description="Painel interno de acompanhamento: pendências, fila de conteúdo e estratégia de crescimento da Thai Cozinha."
+  noindex
+  wide
+>
+  <p style="text-transform:uppercase;letter-spacing:0.12em;font-size:0.75rem;color:var(--ink-soft);font-weight:700;">
+    Painel interno
+  </p>
+  <h1 style="font-size:2rem;line-height:1.15;margin:0.4rem 0 1rem;">Conteúdo e crescimento</h1>
+  <p>
+    Visão geral do que está pendente, o que está na fila de publicação e a estratégia de conteúdo
+    por trás do site de apoio da Thai Cozinha. Página de acompanhamento interno — não indexada em
+    buscadores.
+  </p>
+
+  {pendenciasHtml && (
+    <section style="margin-top:2rem;">
+      <h2 style="font-size:1.3rem;">Pendências</h2>
+      <Fragment set:html={pendenciasHtml} />
+    </section>
+  )}
+
+  <section style="margin-top:2.5rem;">
+    <h2 style="font-size:1.3rem;">Fila de conteúdo (carrosséis)</h2>
+    {pipeline.length === 0 && <p>Nenhum conteúdo na fila ainda.</p>}
+    {pipeline.length > 0 && (
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Peça</th>
+              <th>Slides</th>
+              <th>Legenda</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pipeline.map((p) => (
+              <tr>
+                <td>{p.title}</td>
+                <td>{p.slideCount || '—'}</td>
+                <td>{p.hasLegenda ? 'sim' : 'não'}</td>
+                <td><span class={`badge ${p.badge}`}>{p.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+
+  <section style="margin-top:2.5rem;">
+    <h2 style="font-size:1.3rem;">Posts do blog</h2>
+    {posts.length === 0 && <p>Nenhum post criado ainda.</p>}
+    {posts.length > 0 && (
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Data</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts.map((post) => (
+              <tr>
+                <td>
+                  {post.data.draft ? (
+                    post.data.title
+                  ) : (
+                    <a href={`/blog/${post.id}/`}>{post.data.title}</a>
+                  )}
+                </td>
+                <td>
+                  {post.data.publishedAt.toLocaleDateString('pt-BR', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    timeZone: 'UTC',
+                  })}
+                </td>
+                <td>
+                  <span class={`badge ${post.data.draft ? 'badge-pending' : 'badge-ok'}`}>
+                    {post.data.draft ? 'rascunho' : 'publicado'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+
+  <section style="margin-top:2.5rem;">
+    <h2 style="font-size:1.3rem;">Setup técnico — publicação automática</h2>
+    <ul>
+      <li>Instagram conectado como Business + vinculado a uma Página do Facebook — pendente</li>
+      <li>App no Meta for Developers + token de longa duração — pendente</li>
+      <li><code>.env</code> preenchido com as credenciais (local, nunca commitado) — pendente</li>
+      <li>Site com deploy automático (Netlify/Vercel) pra imagens ficarem acessíveis por URL — pendente</li>
+    </ul>
+    <p style="color:var(--ink-soft);font-size:0.9rem;">
+      Guia passo a passo em <code>marketing/automacao-meta-setup.md</code> (raiz do MazyOS).
+    </p>
+  </section>
+
+  {estrategiaDoc && (
+    <section style="margin-top:2.5rem;">
+      <h2 style="font-size:1.3rem;">{estrategiaDoc.title}</h2>
+      <Fragment set:html={estrategiaDoc.html} />
+    </section>
+  )}
+
+  <section style="margin-top:2.5rem;">
+    <h2 style="font-size:1.3rem;">Pesquisa (referência)</h2>
+    {demandaDoc && (
+      <details>
+        <summary>{demandaDoc.title}</summary>
+        <Fragment set:html={demandaDoc.html} />
+      </details>
+    )}
+    {concorrenciaDoc && (
+      <details>
+        <summary>{concorrenciaDoc.title}</summary>
+        <Fragment set:html={concorrenciaDoc.html} />
+      </details>
+    )}
+    {geoDoc && (
+      <details>
+        <summary>{geoDoc.title}</summary>
+        <Fragment set:html={geoDoc.html} />
+      </details>
+    )}
+  </section>
+</Layout>

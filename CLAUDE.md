@@ -37,6 +37,7 @@ Ao rodar `/seo`, `/publicar-tema` ou `/carrossel` dentro desta pasta:
 
 ## Restrições específicas deste projeto
 
-- Sem orçamento: nenhuma integração ou API paga (sem Meta Business/WhatsApp Business API, sem API de IA paga além do que o Claude Code já oferece)
+- Sem orçamento: nenhuma integração ou API paga (sem WhatsApp Business API — cobra por conversa —, sem API de IA paga além do que o Claude Code já oferece)
+- Meta Graph API (Instagram Business + Facebook Page, pra publicar carrossel automaticamente) é permitida — gratuita pra publicar conteúdo próprio, só precisa de app no Meta for Developers + conta Business + token (configuração iniciada em 2026-07-06)
 - Não mexer no site principal (thaicozinha.com.br) nem na pasta `alhopan-site`/outros clientes
 - Sem rastreio de WhatsApp

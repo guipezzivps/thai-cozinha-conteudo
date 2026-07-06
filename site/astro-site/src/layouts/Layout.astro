@@ -3,9 +3,11 @@ interface Props {
   title: string;
   description: string;
   jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+  wide?: boolean;
 }
 
-const { title, description, jsonLd } = Astro.props;
+const { title, description, jsonLd, noindex = false, wide = false } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const SITE_NAME = 'Thai Cozinha — Conteúdo';
 const MAIN_SITE_URL = 'https://thaicozinha.com.br';
@@ -19,6 +21,7 @@ const INSTAGRAM_URL = 'https://www.instagram.com/thaicozinha_fit';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <title>{title} · {SITE_NAME}</title>
     <meta name="description" content={description} />
@@ -43,10 +46,10 @@ const INSTAGRAM_URL = 'https://www.instagram.com/thaicozinha_fit';
     <style>
       :root {
         color-scheme: light dark;
-        --ink: #1a1a1a;
-        --ink-soft: #555;
-        --bg: #fafaf7;
-        --accent: #c0392b;
+        --ink: #5a2d18;
+        --ink-soft: #8a6a56;
+        --bg: #fefefe;
+        --accent: #5d6b1d;
         --max-width: 42rem;
       }
       * { box-sizing: border-box; }
@@ -70,10 +73,19 @@ const INSTAGRAM_URL = 'https://www.instagram.com/thaicozinha_fit';
         flex-wrap: wrap;
       }
       header a.brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         font-weight: 700;
         text-decoration: none;
         color: var(--ink);
         font-size: 1.05rem;
+      }
+      header a.brand img {
+        height: 34px;
+        width: auto;
+        border-radius: 6px;
+        background: #fefefe;
       }
       header .links a {
         color: var(--ink-soft);
@@ -87,6 +99,27 @@ const INSTAGRAM_URL = 'https://www.instagram.com/thaicozinha_fit';
         margin: 0 auto;
         padding: 0 1.25rem 3rem;
       }
+      table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+      .table-wrap { overflow-x: auto; margin: 1rem 0; }
+      th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid rgba(90,45,24,0.15); }
+      th { color: var(--ink-soft); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+      code { background: rgba(90,45,24,0.08); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.9em; }
+      pre { background: rgba(90,45,24,0.06); padding: 1rem; border-radius: 8px; overflow-x: auto; }
+      pre code { background: none; padding: 0; }
+      blockquote { margin: 1rem 0; padding: 0.25rem 1rem; border-left: 3px solid var(--accent); color: var(--ink-soft); }
+      details { margin: 1rem 0; border: 1px solid rgba(90,45,24,0.15); border-radius: 8px; padding: 0.75rem 1rem; }
+      details summary { cursor: pointer; font-weight: 700; }
+      details[open] summary { margin-bottom: 0.5rem; }
+      .badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 100px; font-size: 0.75rem; font-weight: 700; }
+      .badge-ok { background: rgba(93,107,29,0.15); color: var(--accent); }
+      .badge-pending { background: rgba(194,167,102,0.25); color: #8a6a56; }
+      .badge-todo { background: rgba(90,45,24,0.1); color: var(--ink-soft); }
+      @media (prefers-color-scheme: dark) {
+        th, td { border-bottom-color: rgba(255,255,255,0.12); }
+        code { background: rgba(255,255,255,0.1); }
+        pre { background: rgba(255,255,255,0.08); }
+        details { border-color: rgba(255,255,255,0.15); }
+      }
       footer {
         border-top: 1px solid rgba(0,0,0,0.08);
         color: var(--ink-soft);
@@ -94,23 +127,27 @@ const INSTAGRAM_URL = 'https://www.instagram.com/thaicozinha_fit';
       }
       footer a { color: var(--ink-soft); }
       @media (prefers-color-scheme: dark) {
-        :root { --ink: #f2f2f0; --ink-soft: #aaa; --bg: #14120f; }
-        footer { border-top-color: rgba(255,255,255,0.1); }
+        :root { --ink: #fefefe; --ink-soft: #d8c4b0; --bg: #733518; --accent: #a3b84a; }
+        footer { border-top-color: rgba(255,255,255,0.12); }
       }
     </style>
   </head>
   <body>
     <header>
       <nav>
-        <a class="brand" href="/">Thai Cozinha — Conteúdo</a>
+        <a class="brand" href="/">
+          <img src="/logo.png" alt="Thai Cozinha" width="120" height="80" />
+          Thai Cozinha — Conteúdo
+        </a>
         <div class="links">
           <a href="/blog">Blog</a>
+          <a href="/painel">Painel</a>
           <a href={MAIN_SITE_URL}>Cardápio &amp; pedidos</a>
           <a href={INSTAGRAM_URL}>Instagram</a>
         </div>
       </nav>
     </header>
-    <main>
+    <main style={wide ? '--max-width: 64rem;' : undefined}>
       <slot />
     </main>
     <footer>

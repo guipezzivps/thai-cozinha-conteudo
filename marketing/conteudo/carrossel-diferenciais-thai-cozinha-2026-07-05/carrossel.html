@@ -19,9 +19,9 @@
     padding: 80px 90px;
   }
 
-  .bg-dark { background: #0E1116; color: #FAFAF7; }
-  .bg-light { background: #FAFAF7; color: #1A1A1A; }
-  .bg-accent { background: #C0392B; color: #FAFAF7; }
+  .bg-dark { background: #733518; color: #FEFEFE; }
+  .bg-light { background: #FEFEFE; color: #5A2D18; }
+  .bg-accent { background: #5D6B1D; color: #FEFEFE; }
 
   .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
   .logo { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
@@ -31,8 +31,8 @@
     font-size: 15px; font-weight: 800; text-transform: uppercase;
     letter-spacing: 0.26em; margin-bottom: 22px;
   }
-  .bg-accent .eyebrow, .bg-dark .eyebrow { color: #FAFAF7; opacity: 0.85; }
-  .bg-light .eyebrow { color: #C0392B; }
+  .bg-accent .eyebrow, .bg-dark .eyebrow { color: #FEFEFE; opacity: 0.85; }
+  .bg-light .eyebrow { color: #5D6B1D; }
 
   .title-cover {
     font-size: 96px; font-weight: 900; line-height: 0.98; letter-spacing: -0.04em;
@@ -42,16 +42,16 @@
   .handle { font-size: 22px; font-weight: 600; opacity: 0.75; }
 
   .rule { width: 70px; height: 4px; background: currentColor; opacity: 0.9; margin: 26px 0; }
-  .bg-light .rule { background: #C0392B; }
+  .bg-light .rule { background: #5D6B1D; }
 
   h2 { font-size: 68px; font-weight: 800; line-height: 1.04; letter-spacing: -0.035em; }
   .body-text { font-size: 32px; font-weight: 500; line-height: 1.5; max-width: 800px; margin-top: 10px; }
 
   .number-huge {
     font-size: 280px; font-weight: 800; line-height: 1; letter-spacing: -0.03em;
-    color: #C0392B; margin-bottom: 10px;
+    color: #5D6B1D; margin-bottom: 10px;
   }
-  .bg-accent .number-huge, .bg-dark .number-huge { color: #FAFAF7; }
+  .bg-accent .number-huge, .bg-dark .number-huge { color: #FEFEFE; }
 
   .quote-mark {
     font-size: 220px; font-weight: 800; opacity: 0.14; position: absolute;
@@ -63,11 +63,11 @@
   .content-block { display: flex; flex-direction: column; justify-content: center; flex: 1; }
 
   .cta-final { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; }
-  .cta-final .logo-big { font-size: 40px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 40px; }
+  .cta-final .logo-img { width: 420px; max-width: 100%; margin-bottom: 30px; }
   .cta-final h2 { font-size: 76px; margin-bottom: 20px; }
   .cta-final .sub { font-size: 30px; font-weight: 500; opacity: 0.9; margin-bottom: 34px; }
   .cta-final .cta-box {
-    border: 2px solid rgba(255,255,255,0.6); border-radius: 100px;
+    background: #5D6B1D; color: #FEFEFE; border-radius: 100px;
     padding: 20px 46px; font-size: 26px; font-weight: 700; letter-spacing: 0.02em;
   }
   .cta-final .handle { margin-top: 40px; }
@@ -165,14 +165,14 @@
   <div class="footer-row"><span>thaicozinha.com.br</span><span>@thaicozinha_fit</span></div>
 </div>
 
-<!-- SLIDE 7 — CTA FINAL (destaque) -->
-<div class="slide bg-accent">
+<!-- SLIDE 7 — CTA FINAL (fundo claro, logo real) -->
+<div class="slide bg-light">
   <div class="top-row">
     <div class="logo">THAI COZINHA</div>
     <div class="counter">07 / 07</div>
   </div>
   <div class="cta-final">
-    <div class="logo-big">THAI COZINHA</div>
+    <img class="logo-img" src="../../../identidade/logo.png" alt="Thai Cozinha" />
     <h2>Bora pedir?</h2>
     <div class="sub">Entrega em Porto Alegre e região</div>
     <div class="cta-box">Cardápio + WhatsApp no link da bio</div>
