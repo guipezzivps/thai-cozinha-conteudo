@@ -1,0 +1,45 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.publishedAt.toISOString(),
+  author: { '@type': 'Organization', name: post.data.author },
+  keywords: post.data.keywords.join(', '),
+};
+---
+
+<Layout title={post.data.title} description={post.data.description} jsonLd={jsonLd}>
+  <article>
+    <p style="font-size:0.85rem;color:var(--ink-soft);margin-bottom:0.25rem;">
+      {post.data.publishedAt.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+    </p>
+    <h1 style="font-size:1.9rem;line-height:1.2;margin:0 0 1.25rem;">{post.data.title}</h1>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .prose :global(h2) { font-size: 1.35rem; margin-top: 2rem; }
+  .prose :global(h3) { font-size: 1.1rem; margin-top: 1.5rem; }
+  .prose :global(p) { margin: 1rem 0; }
+  .prose :global(ul), .prose :global(ol) { padding-left: 1.25rem; }
+  .prose :global(a) { color: var(--accent); }
+</style>

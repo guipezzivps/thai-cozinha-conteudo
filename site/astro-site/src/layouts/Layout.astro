@@ -1,0 +1,123 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const { title, description, jsonLd } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const SITE_NAME = 'Thai Cozinha — Conteúdo';
+const MAIN_SITE_URL = 'https://thaicozinha.com.br';
+const INSTAGRAM_URL = 'https://www.instagram.com/thaicozinha_fit';
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title} · {SITE_NAME}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="pt_BR" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
+
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
+
+    <style>
+      :root {
+        color-scheme: light dark;
+        --ink: #1a1a1a;
+        --ink-soft: #555;
+        --bg: #fafaf7;
+        --accent: #c0392b;
+        --max-width: 42rem;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.6;
+      }
+      header, footer {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem;
+      }
+      header nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      header a.brand {
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--ink);
+        font-size: 1.05rem;
+      }
+      header .links a {
+        color: var(--ink-soft);
+        text-decoration: none;
+        margin-left: 1rem;
+        font-size: 0.95rem;
+      }
+      header .links a:hover { color: var(--accent); }
+      main {
+        max-width: var(--max-width);
+        margin: 0 auto;
+        padding: 0 1.25rem 3rem;
+      }
+      footer {
+        border-top: 1px solid rgba(0,0,0,0.08);
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+      }
+      footer a { color: var(--ink-soft); }
+      @media (prefers-color-scheme: dark) {
+        :root { --ink: #f2f2f0; --ink-soft: #aaa; --bg: #14120f; }
+        footer { border-top-color: rgba(255,255,255,0.1); }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a class="brand" href="/">Thai Cozinha — Conteúdo</a>
+        <div class="links">
+          <a href="/blog">Blog</a>
+          <a href={MAIN_SITE_URL}>Cardápio &amp; pedidos</a>
+          <a href={INSTAGRAM_URL}>Instagram</a>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>
+        Site de conteúdo da Thai – Cozinha Fit Inclusiva. Pra ver o cardápio e fazer pedidos,
+        acesse <a href={MAIN_SITE_URL}>thaicozinha.com.br</a>.
+      </p>
+    </footer>
+  </body>
+</html>
